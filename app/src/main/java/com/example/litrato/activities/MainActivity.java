@@ -1,5 +1,6 @@
 package com.example.litrato.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -301,118 +302,94 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id) {
-            case R.id.action_history: {
-                if (ViewTools.isVisible(historyBar)) {
-                    closeHistory();
-                } else {
-                    BottomMenu.closeMenus(bottomMenus);
-                    historyBar.setVisibility(View.VISIBLE);
-                }
-                break;
+        if (id == R.id.action_history) {
+            if (ViewTools.isVisible(historyBar)) {
+                closeHistory();
+            } else {
+                BottomMenu.closeMenus(bottomMenus);
+                historyBar.setVisibility(View.VISIBLE);
             }
+        } else if (id == R.id.action_open) {// Makes sure the phone has a camera module.
+            PackageManager pm = getApplicationContext().getPackageManager();
+            if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                final CharSequence[] items = {"Take Photo", "Choose from Library"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Select a photo...");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
 
-            case R.id.action_open: {
-                // Makes sure the phone has a camera module.
-                PackageManager pm = getApplicationContext().getPackageManager();
-                if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-                    final CharSequence[] items = {"Take Photo", "Choose from Library"};
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Select a photo...");
-                    builder.setItems(items, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int item) {
+                        if (items[item].equals("Take Photo")) {
 
-                            if (items[item].equals("Take Photo")) {
-
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                Uri result = FileInputOutput.createUri(MainActivity.this);
-                                if (result != null) {
-                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, result);
-                                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                                }
-
-                            } else if (items[item].equals("Choose from Library")) {
-                                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                                startActivityForResult(intent,PICK_IMAGE_REQUEST);
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            Uri result = FileInputOutput.createUri(MainActivity.this);
+                            if (result != null) {
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT, result);
+                                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
                             }
+
+                        } else if (items[item].equals("Choose from Library")) {
+                            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(intent, PICK_IMAGE_REQUEST);
                         }
-                    });
-                    builder.show();
+                    }
+                });
+                builder.show();
 
-                    // Else if the phone has no camera
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent,PICK_IMAGE_REQUEST);
-                }
-                break;
+                // Else if the phone has no camera
+            } else {
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, PICK_IMAGE_REQUEST);
             }
-            case R.id.action_save: {
-                Bitmap saveImage = currentImage;
-                if (PreferenceManager.getBoolean(getApplicationContext(), Preference.SAVE_ORIGINAL_RESOLUTION) && FileInputOutput.getLastImportedImagePath() != null) {
-                    Bitmap fullSize = FileInputOutput.getBitmap(FileInputOutput.getLastImportedImagePath());
-                    fullSize = history.goUntilFilter(fullSize, history.size() - 1, getApplicationContext());
-                    saveImage = fullSize;
-                }
-                if (FileInputOutput.saveImageToGallery(saveImage, MainActivity.this)) {
-                    Snackbar.make(layoutToolbar, getString(R.string.savingMessage), Snackbar.LENGTH_SHORT).show();
-                }
-                break;
+        } else if (id == R.id.action_save) {
+            Bitmap saveImage = currentImage;
+            if (PreferenceManager.getBoolean(getApplicationContext(), Preference.SAVE_ORIGINAL_RESOLUTION) && FileInputOutput.getLastImportedImagePath() != null) {
+                Bitmap fullSize = FileInputOutput.getBitmap(FileInputOutput.getLastImportedImagePath());
+                fullSize = history.goUntilFilter(fullSize, history.size() - 1, getApplicationContext());
+                saveImage = fullSize;
             }
-
-            case R.id.action_rotate_left: {
-
-                AppliedFilter lastUsedFilter =  new AppliedFilter(
-                        Filter.getFilterByName(Settings.FILTER_ROTATION),
-                        null,
-                        0,
-                        270,
-                        0,
-                        false,
-                        new PointPercentage(),
-                        new PointPercentage(),
-                        0
-                );
-
-                currentImage = lastUsedFilter.apply(currentImage, getApplicationContext());
-                addToHistory(lastUsedFilter);
-                refreshImageView();
-                break;
+            if (FileInputOutput.saveImageToGallery(saveImage, MainActivity.this)) {
+                Snackbar.make(layoutToolbar, getString(R.string.savingMessage), Snackbar.LENGTH_SHORT).show();
             }
+        } else if (id == R.id.action_rotate_left) {
+            AppliedFilter lastUsedFilter = new AppliedFilter(
+                    Filter.getFilterByName(Settings.FILTER_ROTATION),
+                    null,
+                    0,
+                    270,
+                    0,
+                    false,
+                    new PointPercentage(),
+                    new PointPercentage(),
+                    0
+            );
 
-            case R.id.action_rotate_right: {
+            currentImage = lastUsedFilter.apply(currentImage, getApplicationContext());
+            addToHistory(lastUsedFilter);
+            refreshImageView();
+        } else if (id == R.id.action_rotate_right) {
+            AppliedFilter lastUsedFilter = new AppliedFilter(
+                    Filter.getFilterByName(Settings.FILTER_ROTATION),
+                    null,
+                    0,
+                    90,
+                    0,
+                    false,
+                    new PointPercentage(),
+                    new PointPercentage(),
+                    0
+            );
 
-                AppliedFilter lastUsedFilter =  new AppliedFilter(
-                        Filter.getFilterByName(Settings.FILTER_ROTATION),
-                        null,
-                        0,
-                        90,
-                        0,
-                        false,
-                        new PointPercentage(),
-                        new PointPercentage(),
-                        0
-                );
-
-                currentImage = lastUsedFilter.apply(currentImage, getApplicationContext());
-                addToHistory(lastUsedFilter);
-                refreshImageView();
-                break;
-            }
-
-            case R.id.action_settings: {
-                Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
-                startActivityForResult(intent, CONFIG_REQUEST);
-                break;
-            }
-
-            case R.id.action_exif: {
-                Intent intent = new Intent(getApplicationContext(), ExifActivity.class);
-                startActivity(intent);
-                break;
-            }
-
+            currentImage = lastUsedFilter.apply(currentImage, getApplicationContext());
+            addToHistory(lastUsedFilter);
+            refreshImageView();
+        } else if (id == R.id.action_settings) {
+            Intent intent = new Intent(getApplicationContext(), PreferencesActivity.class);
+            startActivityForResult(intent, CONFIG_REQUEST);
+        } else if (id == R.id.action_exif) {
+            Intent intent = new Intent(getApplicationContext(), ExifActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
