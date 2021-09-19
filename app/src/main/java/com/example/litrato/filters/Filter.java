@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.litrato.R;
 import com.example.litrato.activities.tools.Settings;
 import com.example.litrato.tools.FileInputOutput;
@@ -25,7 +27,11 @@ import java.util.List;
 
 public class Filter {
 
+    @NonNull
     public static final List<Filter> filters = new ArrayList<>();
+
+    @NonNull
+    public static final List<Filter> filterList = new ArrayList<>();
 
     /**
      * The name displayed in the spinner.
@@ -597,7 +603,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Change hue", Category.COLOR);
         newFilter.setColorSeekBar();
@@ -608,7 +614,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Selective coloring", Category.COLOR);
         newFilter.setColorSeekBar();
@@ -625,7 +631,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Hue shift", Category.COLOR);
         newFilter.setSeekBar1(-180, 0, 180, "Shift amount", "deg");
@@ -636,7 +642,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
 
         // End of Filters > Color
@@ -653,7 +659,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Posterize", Category.FANCY);
         newFilter.setSeekBar1(2, 10, 32, "Number of values","steps");
@@ -665,7 +671,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         // End of Filters > Fancy
 
@@ -681,7 +687,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Gaussian blur", Category.BLUR);
         newFilter.setSeekBar1(1, 2, 25, "Radius", "px");
@@ -692,7 +698,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Directional blur", Category.BLUR);
         newFilter.setSeekBar1(2, 2, 30, "Radius", "");
@@ -704,7 +710,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         // End of Filters > Blur
 
@@ -719,7 +725,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Sobel", Category.CONTOUR);
         newFilter.setSeekBar1(1, 2, 14, "Sensibility","px");
@@ -731,7 +737,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Sketch", Category.CONTOUR);
         newFilter.setSeekBar1(1, 4, 14, "Contour finesse","");
@@ -753,7 +759,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
 
         newFilter = new Filter("Cartoon", Category.CONTOUR);
         newFilter.setSeekBar1(1, 0, 100, "Black value","px");
@@ -765,7 +771,7 @@ public class Filter {
                 return null;
             }
         });
-        filters.add(newFilter);
+        filterList.add(newFilter);
     }
 
     /**
